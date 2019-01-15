@@ -1328,9 +1328,18 @@ public class ContextConfig implements LifecycleListener {
 
             // Step 5. Process JARs for annotations - only need to process
             // those fragments we are going to use
+            long begin = System.currentTimeMillis();
             if (ok) {
                 processAnnotations(
                         orderedFragments, webXml.isMetadataComplete());
+            }
+            log.info("codingdie servlet3 processAnnotations cost : " + (System.currentTimeMillis() - begin));
+            if(fragments != null && orderedFragments.size()>0){
+                for(WebXml fragmentItem : orderedFragments){
+                    log.info("codingdie servlet3 result: "+fragmentItem.getJarName()+'\t'+ fragmentItem.getServlets().size()+"\t"+fragmentItem.getFilters().size()+"\t"+fragmentItem.getListeners().size());
+                }
+            }else{
+                log.info("codingdie no any jar use servlet3");
             }
 
             // Cache, if used, is no longer required so clear it
@@ -1636,6 +1645,7 @@ public class ContextConfig implements LifecycleListener {
      * added in web-fragment.xml priority order.
      */
     protected void processResourceJARs(Set<WebXml> fragments) {
+        long beginTime = System.currentTimeMillis();
         for (WebXml fragment : fragments) {
             URL url = fragment.getURL();
             Jar jar = null;
@@ -1647,6 +1657,7 @@ public class ContextConfig implements LifecycleListener {
                     String entryName = jar.getEntryName();
                     while (entryName != null) {
                         if (entryName.startsWith("META-INF/resources/")) {
+                            log.info("codingdie resource jar : " +url.getPath() + "\t" + entryName);
                             context.addResourceJarUrl(url);
                             break;
                         }
@@ -1660,10 +1671,11 @@ public class ContextConfig implements LifecycleListener {
                         fileDirContext.lookup("META-INF/resources/");
                         //lookup succeeded
                         if(context instanceof StandardContext){
+                            log.info("codingdie resource jar : " + url.getPath());
                             ((StandardContext)context).addResourcesDirContext(fileDirContext);
                         }
                     } catch (NamingException e) {
-                        //not found, ignore
+                        e.printStackTrace();
                     }
                 }
             } catch (IOException ioe) {
@@ -1678,6 +1690,8 @@ public class ContextConfig implements LifecycleListener {
                 }
             }
         }
+        log.info("codingdie processResourceJARs cost : " + (System.currentTimeMillis() - beginTime));
+
     }
 
 

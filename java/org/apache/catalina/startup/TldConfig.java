@@ -266,10 +266,12 @@ public final class TldConfig  implements LifecycleListener {
 
         // Stages 3b & 4
         JarScanner jarScanner = context.getJarScanner();
-        
+
+        long beginTime = System.currentTimeMillis();
         TldJarScannerCallback tldCallBack = new TldJarScannerCallback();
         jarScanner.scan(context.getServletContext(), context.getLoader().getClassLoader(),
                 tldCallBack, noTldJars);
+        log.info("codingdie tld cost:" + (System.currentTimeMillis()-beginTime));
         if(tldCallBack.scanFoundNoTLDs()){
             log.info(sm.getString("tldConfig.noTldSummary"));
         }
@@ -531,6 +533,7 @@ public final class TldConfig  implements LifecycleListener {
                             jarConn.getURL().getFile()));
                 }
             }
+            log.info("codingdie tld : "+jarConn.getURL().getFile()+"\t"+isFound);
         } catch (IOException ioe) {
             log.warn(sm.getString("tldConfig.jarFail", jarConn.getURL()), ioe);
         } finally {

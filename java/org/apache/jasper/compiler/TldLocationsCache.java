@@ -242,12 +242,13 @@ public class TldLocationsCache {
         try {
             tldScanWebXml();
             tldScanResourcePaths(WEB_INF);
-            
+
+            long beginTime = System.currentTimeMillis();
             JarScanner jarScanner = JarScannerFactory.getJarScanner(ctxt);
             jarScanner.scan(ctxt,
                     Thread.currentThread().getContextClassLoader(),
                     new TldJarScannerCallback(), noTldJars);
-
+            log.info("codingdie scan jar for tld cost : " + (System.currentTimeMillis() - beginTime));
             initialized = true;
         } catch (Exception ex) {
             throw new JasperException(Localizer.getMessage(
@@ -479,7 +480,7 @@ public class TldLocationsCache {
 
         if (!foundTld) {
             if (log.isDebugEnabled()) {
-                log.debug(Localizer.getMessage("jsp.tldCache.noTldInJar",
+                log.info(Localizer.getMessage("jsp.tldCache.noTldInJar",
                         resourcePath));
             } else if (showTldScanWarning) {
                 // Not entirely thread-safe but a few duplicate log messages are
